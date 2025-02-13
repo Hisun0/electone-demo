@@ -1,0 +1,54 @@
+CREATE TABLE users (
+	user_id serial4 NOT NULL,
+	full_name varchar(255) NOT NULL,
+	birthday date NOT NULL,
+	CONSTRAINT users_pkey PRIMARY KEY (user_id)
+);
+
+\COPY users(full_name, birthday) FROM '~/Downloads/Family_members_import.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+CREATE TABLE users_job (
+	id serial4 NOT NULL,
+	user_id int4 NOT NULL,
+	"position" varchar(255) NULL,
+	organization varchar(255) NULL,
+	salary int4 NULL,
+	start_date date NULL,
+	CONSTRAINT users_job_pkey PRIMARY KEY (id),
+	CONSTRAINT fk_users_job FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE
+);
+
+\COPY users_job(user_id, position, organization, salary, start_date) FROM '~/Downloads/Family_members_job_import.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+CREATE TABLE categories (
+	category_id serial4 NOT NULL,
+	category_name varchar(100) NOT NULL,
+	CONSTRAINT categories_category_name_key UNIQUE (category_name),
+	CONSTRAINT categories_pkey PRIMARY KEY (category_id)
+);
+
+\COPY categories(category_name) FROM '~/Downloads/Product_import - Лист1.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+CREATE TABLE products (
+	product_id serial4 NOT NULL,
+	category_id int4 NOT NULL,
+	price int4 NOT NULL,
+	product_name varchar(255) NULL,
+	CONSTRAINT products_pkey PRIMARY KEY (product_id),
+	CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES public.categories(category_id) ON DELETE CASCADE
+);
+
+\COPY products(product_name, category_id, price) FROM '~/Downloads/Product_import\ -\ Лист1\ \(1\).csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+CREATE TABLE expenses (
+	expense_id serial4 NOT NULL,
+	user_id int4 NOT NULL,
+	amount numeric(10, 2) NOT NULL,
+	expense_date date NOT NULL,
+	product_id int4 NOT NULL,
+	CONSTRAINT expenses_pkey PRIMARY KEY (expense_id),
+	CONSTRAINT fk_expense_user FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE,
+	CONSTRAINT fk_expenses FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE CASCADE
+);
+
+\COPY expenses(expense_date, user_id, product_id, amount) FROM '~/Downloads/Expence_product_import.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
